@@ -1,24 +1,34 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import API from './API';
+
+import List from '@material-ui/core/List';
+
+import LineItem from './components/lineItem';
 
 class App extends Component {
+  state = {
+    results: [],
+  }
+  componentDidMount() {
+    API.getByMonth('june')
+      .then(({ data: entries }) => {
+        console.log('entries', entries);
+        this.setState({ results: entries });
+      })
+  }
+
   render() {
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
           <p>
-            Edit <code>src/App.js</code> and save to reload.
+            There are {this.state.results.length} transactions for June.
           </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
+          <List>
+            {this.state.results.map((transaction) => (
+              <LineItem key={transaction.id} transaction={transaction} />
+            ))}
+          </List>
         </header>
       </div>
     );
