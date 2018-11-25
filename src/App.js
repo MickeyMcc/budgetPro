@@ -10,7 +10,7 @@ class App extends Component {
     results: [],
   }
   componentDidMount() {
-    API.getByMonth('june')
+    API.getByMonth('september')
       .then(({ data: entries }) => {
         console.log('entries', entries);
         this.setState({ results: entries });

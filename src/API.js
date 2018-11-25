@@ -6,8 +6,12 @@ const API = axios.create({
 
 const methods = {};
 
-methods.getByMonth = (month) => {
-    return API.get('/items', { month });
+methods.getTransactionsByMonth = (month) => {
+    return API.get('/transactions/month', { month });
+}
+
+methods.getBudgetByMonth = (month) => {
+    return API.get('/budgets/month', { month })
 }
 
 export default methods;
