@@ -1,35 +1,41 @@
 import React, { Component } from 'react';
-import API from './API';
+import './App.css';
 
-import List from '@material-ui/core/List';
+import TransactionsMain from './components/transactionsMain';
+import BudgetMain from './components/budgetMain';
+import TopBar from './components/topBar';
+import SideBar from './components/sideBar';
 
-import LineItem from './components/lineItem';
+const OverviewMain = () => <div />;
 
 class App extends Component {
   state = {
-    results: [],
+    month: 'september',
+    sideBarSelected: 0,
   }
-  componentDidMount() {
-    API.getByMonth('september')
-      .then(({ data: entries }) => {
-        console.log('entries', entries);
-        this.setState({ results: entries });
-      })
+
+  MainSection({ selected, month }) {
+    switch(selected) {
+      case 0:
+        return <TransactionsMain month={month} />;
+      case 1:
+        return <BudgetMain month={month} />
+      case 2:
+        return <OverviewMain month={month} />
+      default:
+        return <div>Please select a month</div>
+    }
   }
 
   render() {
+    const { MainSection } = this;
     return (
       <div className="App">
-        <header className="App-header">
-          <p>
-            There are {this.state.results.length} transactions for June.
-          </p>
-          <List>
-            {this.state.results.map((transaction) => (
-              <LineItem key={transaction.id} transaction={transaction} />
-            ))}
-          </List>
-        </header>
+        <TopBar month={this.state.month} />
+        <div className="flex-row">
+          <SideBar selected={this.state.sideBarSelected} setSelected={idx => this.setState({ sideBarSelected: idx })}/>
+          <MainSection selected={this.state.sideBarSelected} month={this.state.month} />
+        </div>
       </div>
     );
   }

@@ -1,6 +1,11 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
-
+const { app, BrowserWindow, ipcMain } = require('electron')
+const {
+  con,
+  getTransactionsByMonth,
+  getBudgetByMonth,
+  updateTransactionCategory,
+} = require('./mainProcess/database');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
@@ -13,7 +18,7 @@ function createWindow () {
   mainWindow.loadURL('http://localhost:3000');
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -27,13 +32,39 @@ function createWindow () {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', () => {
+  createWindow();
+
+  ipcMain.on('fetch-transactions', (event, data) => {
+    console.log('fetch transactions received', event)
+    getTransactionsByMonth(data, (err, transactions) => {
+      console.log('READY TO SEND BACK', data.month)
+      event.sender.send('send-transactions', { ...data, transactions });
+    })
+  });
+
+  ipcMain.on('fetch-budget', (event, data) => {
+    getBudgetByMonth(data, (err, budget) => {
+      event.sender.send('send-budget', { ...data, budget});
+    });
+  });
+
+  ipcMain.on('set-transaction-category', (event, data) => {
+    console.log(data);
+    updateTransactionCategory(data, (err, data) => {
+      if (err) {
+        event.sender.send('set-transaction-category-err', { ...data, err})
+      }
+    })
+  });
+})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
+    con.end();
     app.quit()
   }
 })
