@@ -1,9 +1,6 @@
 import React from 'react';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import ListItemText from '@material-ui/core/ListItemText';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
+import changeCase from 'change-case';
+import './lineItem.css';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -31,21 +28,20 @@ export default class LineItem extends React.Component{
     const { availableCategories } = this.props;
     const { entity, date, transaction_amount, id } = this.props.transaction;
     return (
-      <ListItem key={id}>
-        <ListItemText secondary={date} />
-        <ListItemText primary={entity} />
-        <ListItemText secondary={transaction_amount} />
-        <ListItemSecondaryAction>
-          <Select
-            root={{ width: 150 }}
+      <div key={id} className={`lineitem-container ${this.props.idx % 2 ? 'list-odd': 'list-even'}`}>
+        <div className="lineitem-date">{date}</div>
+        <div className="lineitem-vendor">{entity}</div>
+        <div className="lineitem-cost">{transaction_amount}</div>
+        <div className = "lineitem-dropdown">
+          <select
             value={category}
             onChange={(e) => this.handleChange(e.target.value)}
           >
-          <MenuItem value={0}>Unknown</MenuItem>
-          {availableCategories.map((cat, idx) => <MenuItem key={idx} value={this.props.getCatId(cat)}>{cat}</MenuItem>)}
-        </Select>
-        </ListItemSecondaryAction>
-      </ListItem>
-    );
+            <option value={0}>Unknown</option>
+            {availableCategories.map((cat, idx) => <option key={idx} value={this.props.getCatId(cat)}>{changeCase.titleCase(cat)}</option>)}
+          </select>
+        </div>
+      </div>
+    )
   }
 };

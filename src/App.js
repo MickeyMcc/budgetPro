@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import './App.css';
 
-import TransactionsMain from './components/transactionsMain';
-import BudgetMain from './components/budgetMain';
-import TopBar from './components/topBar';
-import SideBar from './components/sideBar';
+import TransactionsMain from './components/transactions/transactionsMain';
+import BudgetMain from './components/createBudget/budgetMain';
+import TopBar from './components/menus/topBar';
+import SideBar from './components/menus/sideBar';
 
 const OverviewMain = () => <div />;
 

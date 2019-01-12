@@ -1,0 +1,62 @@
+.budgetitem-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 500px;
+    height: 50px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.budgetitem-cost {
+    color: black;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: right;
+}
+
+.budgetitem-category {
+    color: black;
+    font-size: 14px;
+    font-weight: 300;
+    font-family: Arial,
+    Helvetica,
+    sans-serif;
+    text-align: left;
+}
+
+.delete {
+    height: 10px;
+    width: 10px;
+}
+
+.container-create-category {
+    height: 150px;
+    width: 500px;
+    margin-left: 15px;
+    display: 'flex';
+    flex-direction: 'row';
+    justify-content: 'flex-start';
+    text-align: 'left';
+}
+
+.sub-container {
+    text-align: 'left';
+}
+
+.category-selector {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.category-input {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.button {
+    margin-left: 10px;
+    margin-right: 10px;
+}

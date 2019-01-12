@@ -4,11 +4,12 @@
   "private": true,
   "dependencies": {
     "@material-ui/core": "^3.5.1",
+    "change-case": "^3.0.2",
+    "electron": "^3.0.10",
     "mysql": "^2.16.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
-    "react-scripts": "2.1.1",
-    "electron": "^3.0.10"
+    "react-scripts": "2.1.1"
   },
   "main": "src/electron-starter.js",
   "scripts": {

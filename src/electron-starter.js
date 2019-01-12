@@ -4,6 +4,7 @@ const {
   con,
   getTransactionsByMonth,
   getBudgetByMonth,
+  getAllCategories,
   updateTransactionCategory,
 } = require('./mainProcess/database');
 // Keep a global reference of the window object, if you don't, the window will
@@ -36,9 +37,7 @@ app.on('ready', () => {
   createWindow();
 
   ipcMain.on('fetch-transactions', (event, data) => {
-    console.log('fetch transactions received', event)
     getTransactionsByMonth(data, (err, transactions) => {
-      console.log('READY TO SEND BACK', data.month)
       event.sender.send('send-transactions', { ...data, transactions });
     })
   });
@@ -49,8 +48,14 @@ app.on('ready', () => {
     });
   });
 
-  ipcMain.on('set-transaction-category', (event, data) => {
+  ipcMain.on('fetch-categories', (event, data) => {
     console.log(data);
+    getAllCategories(data, (err, categories) => {
+      event.sender.send('send-categories', { ...data, categories })
+    })
+  })
+
+  ipcMain.on('set-transaction-category', (event, data) => {
     updateTransactionCategory(data, (err, data) => {
       if (err) {
         event.sender.send('set-transaction-category-err', { ...data, err})

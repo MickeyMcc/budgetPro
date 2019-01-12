@@ -1,7 +1,4 @@
 import React, { Component } from 'react';
-import '../App.css';
-
-import List from '@material-ui/core/List';
 
 import LineItem from './lineItem';
 const { ipcRenderer } = window.require('electron');
@@ -22,7 +19,6 @@ class Transactions extends Component {
   }
 
   componentDidMount() {
-    console.log(ipcRenderer);
     this.fetchTransactions();
     this.fetchBudget();
 
@@ -35,8 +31,7 @@ class Transactions extends Component {
   }
 
   recieveTransactions ( event, { month, transactions }){
-    console.log(month, transactions);
-    this.setState({transactions})
+    this.setState({transactions});
   }
 
   fetchBudget() {
@@ -70,11 +65,18 @@ class Transactions extends Component {
                 There are {transactions.length} transactions for {month}.
                 </p>
             </header>
-            <List>
-                {transactions.map((transaction) => (
-                <LineItem key={transaction.id} transaction={transaction} availableCategories={categories} getCatId={(name) => this.getCatId(name)} />
+            To Be Categorized
+            <ul className="transaction-list">
+                {transactions.filter((transaction) => !transaction.cat_id).map((transaction, idx) => (
+                <LineItem key={transaction.id} idx={idx} transaction={transaction} availableCategories={categories} getCatId={(name) => this.getCatId(name)} />
                 ))}
-            </List>
+            </ul>
+            Complete
+            <ul className="transaction-list">
+                {transactions.filter((transaction) => transaction.cat_id).map((transaction, idx) => (
+                <LineItem key={transaction.id} idx={idx} transaction={transaction} availableCategories={categories} getCatId={(name) => this.getCatId(name)} />
+                ))}
+            </ul>
         </div>
     );
   }
