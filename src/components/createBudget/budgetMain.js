@@ -9,6 +9,7 @@ class Budget extends Component {
   state = {
     budgetObj: {},
     categories: [],
+    allCategories: [],
   }
 
   componentDidMount() {
@@ -32,7 +33,6 @@ class Budget extends Component {
   }
 
   recieveBudget ( event, { month, budget }){
-    console.log(budget);
     const budgetObj = budget.reduce((acc, entry) => {
       acc[entry.cat_name] = {
         amount: entry.budget_amount,
@@ -42,21 +42,46 @@ class Budget extends Component {
     }, {});
     this.setState({
       budget: budgetObj,
-      categories: Object.keys(budgetObj)
+      categories: Object.keys(budgetObj),
     });
+
+    if (this.state.allCategories.length) {
+      this.filterForUnusedCategories(Object.keys(budgetObj), null)
+    }
   }
 
   recieveCategories (event, { month, categories }) {
-    console.log(categories);
     this.setState({
       allCategories: categories,
     })
+    if (this.state.categories.length) {
+      this.filterForUnusedCategories(null, categories)
+    }
+  }
+
+  filterForUnusedCategories (used, all) {
+    if (!used) {
+      used = this.state.categories;
+    }
+    if (!all) {
+      all = this.state.allCategories;
+    }
+
+    const usedIds = used.reduce((acc, cat) => {
+      acc[cat.cat_id] = true;
+      return acc
+    }, {});
+    this.setState({ unusedCategories: all.filter(cat => usedIds[cat.cat_id]) });
   }
 
   render() {
     return (
       <div className="flex-column">
-        <CreateNewCategory />
+        <CreateNewCategory
+          allCategories={this.state.allCategories}
+          unusedCategories={this.state.unusedCategories}
+          month={this.props.month}
+        />
         {this.state.categories.map((category, idx) => 
           <BudgetItem
             key={idx}

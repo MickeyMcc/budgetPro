@@ -28,25 +28,42 @@ const basicQuery = (sql, params) => new Promise((resolve, reject) =>
 );
 
 const createCategory = async (catName, isIncome) => {
-  return basicQuery('INSERT INTO categories (name, income) VALUES (?, ?);', [catName, isIncome])
+  return basicQuery('INSERT INTO categories (cat_name, income) VALUES (?, ?);', [catName, isIncome])
 }
 
-const createBudgetCategory = async ({ month, amount, category, income, distributionCatId }, cb) => {
-  const cat_id = typeof category === 'string' ? undefined : category;
-  if (!cat_id) {
-    const creationData = await createCategory(category, income);
-    // creation data needs to include the id of the new category;
-    cat_id = creationData.cat_id // this probably doesn't exist
+// {
+//   month: "september",
+//   newCategory: "food_stuff",
+//   catId: 0,
+//   amount: 300.00,
+//   income: false
+//   distribution: 1
+// }
+
+const createBudgetCategory = async ({ month, amount, newCategory, catId, income, distribution }, cb) => {
+  let newCatId;
+  
+  try {
+    if (!catId) {
+      if (!newCategory) {
+        throw new Error('no category selected');
+      }
+      const creationData = await createCategory(newCategory, income);
+      newCatId = Object.assign({}, creationData).insertId;
+    }
+    distribution = distribution || null;
+    const insert = "INSERT INTO BUDGETS (cat_id, month_id, dist_id, budget_amount) VALUES (?, (SELECT month_id FROM months WHERE month_name=?), ?, ?);";
+    const params = [newCatId || catId, month, distribution, amount];
+    basicQuery(insert, params)
+      .then(data => {
+        console.log(data);
+        cb(null, data);
+      })
+  } catch (err) {
+    console.log(err);
+    cb(err)
+    // couldnot create budget item, figure out why
   }
-  const insert = "INSERT INTO BUDGETS (category_id, month_id, distribution_id, amount) VALUES (?, ?, ?, ?);";
-  const params = [cat_id, month, distributionCatId, amount];
-  basicQuery(insert, params)
-    .then(data => {
-      cb(null, data);
-    })
-    .catch(err => {
-      // couldnot create budget item, figure out why
-    })
 }
 
 const getTransactionsByMonth = async ({ month }, cb) => {
@@ -74,12 +91,10 @@ const getBudgetByMonth = async ({ month }, cb) => {
 
 const getAllCategories = async ({ month }, cb) => {
   try {
-    console.log(month)
     const categories = await basicQuery(
       'SELECT * FROM categories',
       [month],
     );
-    console.log(categories);
     cb(null, categories);
   } catch (err) {
     cb(err);
@@ -88,7 +103,6 @@ const getAllCategories = async ({ month }, cb) => {
 
 const updateTransactionCategory = async ({transaction, category}, cb) => {
   const newCategory = category || null; // convert 0 for 'unknown' to null
-  console.log(transaction, category);
   try {
     const result = await basicQuery(
       'UPDATE transactions SET cat_id = ? WHERE id = ?', [newCategory, transaction],
@@ -105,4 +119,5 @@ module.exports = {
   getBudgetByMonth,
   updateTransactionCategory,
   getAllCategories,
+  createBudgetCategory,
 }

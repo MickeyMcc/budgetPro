@@ -6,6 +6,7 @@ const {
   getBudgetByMonth,
   getAllCategories,
   updateTransactionCategory,
+  createBudgetCategory,
 } = require('./mainProcess/database');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -49,7 +50,6 @@ app.on('ready', () => {
   });
 
   ipcMain.on('fetch-categories', (event, data) => {
-    console.log(data);
     getAllCategories(data, (err, categories) => {
       event.sender.send('send-categories', { ...data, categories })
     })
@@ -57,6 +57,14 @@ app.on('ready', () => {
 
   ipcMain.on('set-transaction-category', (event, data) => {
     updateTransactionCategory(data, (err, data) => {
+      if (err) {
+        event.sender.send('set-transaction-category-err', { ...data, err})
+      }
+    })
+  });
+
+  ipcMain.on('create-budget-category', (event, data) => {
+    createBudgetCategory(data, (err, data) => {
       if (err) {
         event.sender.send('set-transaction-category-err', { ...data, err})
       }

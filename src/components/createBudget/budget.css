@@ -33,7 +33,7 @@
 }
 
 .container-create-category {
-    height: 150px;
+    height: 200px;
     width: 500px;
     margin-left: 15px;
     display: 'flex';
@@ -44,6 +44,7 @@
 
 .sub-container {
     text-align: 'left';
+    margin-bottom: 10px;
 }
 
 .category-selector {
