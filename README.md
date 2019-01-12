@@ -21,28 +21,30 @@ My budgeting style is all about the idea of creating 'funds' for each of your fi
 
 ## Project Goals/Roadmap
 
-[x] Create robust database structure for creating relationships between transactions, months, categories and budgets
+- [x] Create robust database structure for creating relationships between transactions, months, categories and budgets
 
-[x] Transaction category assignment
+- [x] Transaction category assignment
 
-[] Vendor default category assignment
+- [ ] Vendor default category assignment
 
-[] Monthly Budget Overview Page
+- [ ] Monthly Budget Overview Page
 
-[] Budget Creation Page
+- [x] Budget Creation Page
 
-[] Monthly close-out
+- [ ] Monthly close-out
 
-[] Monthly in-flow
+- [ ] Monthly in-flow
 
-[] Vendor category suggestions
+- [ ] Vendor category suggestions
 
-[] Trends page (with suggestions on how budget may be adjusted)
+- [ ] Trends page (with suggestions on how budget may be adjusted)
 
-[] Support upload via CSV of transactions in-app
+- [ ] Support upload via CSV of transactions in-app
 
 ## To run project
 run npm install, duh
+
+make sure you have mysql installed globally, and the connection in /mainProcess/database.js is correct and initialize the schema present in that directory
 
 In the project directory, run:
 
@@ -53,7 +55,7 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser, b
 
 Next run:
 
-### `npm run electron`
+### `npm run electron .`
 
 This will start electron and open a Desktop window porting the webpacked content of http://localhost:3000.  It will also create a connection with a local mysql database which can be configured in ./src/mainProcess/database.js
 
