@@ -58,4 +58,3 @@ Next run:
 ### `npm run electron .`
 
 This will start electron and open a Desktop window porting the webpacked content of http://localhost:3000.  It will also create a connection with a local mysql database which can be configured in ./src/mainProcess/database.js
-
