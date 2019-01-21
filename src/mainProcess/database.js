@@ -115,13 +115,15 @@ const updateTransactionCategory = async ({transaction, category}, cb) => {
 
 const getSpendingByMonth = async ({ month }, cb) => {
   try {
-    const query = "SELECT cat_id, " +
-      "(SELECT cat_name FROM categories WHERE budgets.cat_id = categories.cat_id) as cat_name, " + // could also do this with a join
-      "budget_amount, " +
+    const query = "SELECT categories.cat_id as cat_id, " +
+      "categories.cat_name as cat_name, " + 
+      "categories.income as income, " +
+      "budgets.budget_amount, " +
       "(SELECT SUM(transaction_amount) FROM transactions " + // total transactions
       "WHERE month_id = (SELECT month_id FROM months WHERE month_name = ?) " +
       "AND budgets.cat_id = transactions.cat_id) as spending_amount " + // for a particular month and category
-      "FROM budgets WHERE month_id = (SELECT month_id FROM months WHERE month_name = ?);" // budgets is used to know what categories are about to have attributed categories
+      "FROM budgets INNER JOIN categories ON categories.cat_id = budgets.cat_id " + // join categories
+      "WHERE month_id = (SELECT month_id FROM months WHERE month_name = ?);" // budgets is used to know what categories are about to have attributed categories
     const params = [month, month];
     const spendingStatus = await basicQuery(query, params)
     cb(null, spendingStatus);
@@ -140,4 +142,5 @@ module.exports = {
   updateTransactionCategory,
   getAllCategories,
   createBudgetCategory,
+  getSpendingByMonth,
 }

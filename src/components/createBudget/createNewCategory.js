@@ -23,6 +23,7 @@ class CreateNewCategory extends Component {
   }
   
   onSelectCategory(id) {
+    console.log(id)
     this.setState({ selected: id })
   }
 
@@ -74,7 +75,7 @@ class CreateNewCategory extends Component {
         <h4>Add a Category</h4>
         <div className="sub-container">
           New Category
-          <select className="category-selector" value={0} onChange={(e) => this.onSelectCategory(e.target.value)}>
+          <select className="category-selector" value={this.state.selected} onChange={(e) => this.onSelectCategory(e.target.value)}>
             <option value={0}>New Category</option>
             {this.props.unusedCategories && this.props.unusedCategories.map(category => 
               <option value={category.cat_id}>{changeCase.titleCase(category.cat_name)}</option>  

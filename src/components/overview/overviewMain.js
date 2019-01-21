@@ -1,58 +1,110 @@
 import React, { Component } from 'react';
-import './budget.css';
-import BudgetItem from './budgetItem';
+import ReactTable from 'react-table';
+import changeCase from 'change-case';
+
+import "react-table/react-table.css";
 
 const { ipcRenderer } = window.require('electron');
 
 class Overview extends Component {
   state = {
-    budgetObj: {},
-    categories: [],
-    allCategories: [],
+    spending: [],
+    income: [],
+    expenditures: [],
   }
 
   componentDidMount() {
-    this.fetchBudget();
-    this.fetchAllCategories();
+    this.fetchSpending();
 
     ipcRenderer.on('send-spending-status', this.recieveSpendingStatus.bind(this));
   }
 
-  fetchBudget() {
+  fetchSpending() {
     ipcRenderer.send('fetch-spending-status', {
       month: this.props.month,
     });
   }
 
   recieveSpendingStatus ( event, { month, spending }){
-    const budgetObj = spending.reduce((acc, entry) => {
-      acc[entry.cat_name] = {
-        amount: entry.budget_amount,
-        cat_id: entry.cat_id,
-      };
-      return acc;
-    }, {});
-    this.setState({
-      budget: budgetObj,
-      categories: Object.keys(budgetObj),
-    });
+    console.log(spending);
+    const expenditures = [];
+    const income = [];
 
-    if (this.state.allCategories.length) {
-      this.filterForUnusedCategories(Object.keys(budgetObj), null)
-    }
+    spending.forEach(cat => {
+      cat.income ? income.push(cat) : expenditures.push(cat);
+    });
+    this.setState({
+      spending,
+      expenditures,
+      income,
+    });
   }
 
   render() {
+    const { expenditures, income } = this.state;
     return (
       <div className="flex-column">
-        {this.state.categories.map((category, idx) => 
-          <BudgetItem
-            key={idx}
-            amount={this.state.budget[category] && this.state.budget[category].amount}
-            name={category}
-            idx={idx}
-          />
-        )}
+        INCOME
+        <ReactTable
+          data={income}
+          columns={[
+            { 
+              Header: 'Name',
+              id: 'name',
+              accessor: cat => changeCase.titleCase(cat['cat_name']),
+              minWidth: 200,
+            },
+            {
+              Header: 'Budgetted',
+              id: 'budgetted',
+              accessor: d => d.budget_amount.toFixed(2),
+            },
+            {
+              Header: 'Realized',
+              id: 'spent',
+              accessor: cat => cat.spending_amount ? cat.spending_amount.toFixed(2) : 0.00
+            },
+            {
+              Header: 'Waiting For',
+              id: 'remaining',
+              accessor: cat => (cat.budget_amount + cat.spending_amount).toFixed(2)
+            }
+          ]}
+          showPagination={false}
+          pageSize={income.length}
+          className="-striped -highlight"
+        />
+        <br />
+        EXPENDITURES
+        <ReactTable
+          data={expenditures}
+          columns={[
+            { 
+              Header: 'Name',
+              id: 'name',
+              accessor: cat => changeCase.titleCase(cat['cat_name']),
+              minWidth: 200,
+            },
+            {
+              Header: 'Budgetted',
+              id: 'budgetted',
+              accessor: d => d.budget_amount.toFixed(2),
+            },
+            {
+              Header: 'Spent',
+              id: 'spent',
+              accessor: cat => cat.spending_amount ? cat.spending_amount.toFixed(2) : 0.00
+            },
+            {
+              Header: 'Remaining',
+              id: 'remaining',
+              accessor: cat => (cat.budget_amount + cat.spending_amount).toFixed(2)
+            }
+          ]}
+          showPagination={false}
+          pageSize={expenditures.length}
+          className="-striped -highlight"
+        />
       </div>
     );
   }

@@ -18,6 +18,7 @@ class Budget extends Component {
 
     ipcRenderer.on('send-budget', this.recieveBudget.bind(this));
     ipcRenderer.on('send-categories', this.recieveCategories.bind(this));
+    ipcRenderer.on('new-budget-category', this.fetchBudget.bind(this));
   }
 
   fetchAllCategories() {
@@ -27,6 +28,7 @@ class Budget extends Component {
   }
 
   fetchBudget() {
+    console.log('fetchBudget');
     ipcRenderer.send('fetch-budget', {
       month: this.props.month,
     });
@@ -66,12 +68,12 @@ class Budget extends Component {
     if (!all) {
       all = this.state.allCategories;
     }
-
-    const usedIds = used.reduce((acc, cat) => {
-      acc[cat.cat_id] = true;
+    
+    const usedNames = used.reduce((acc, catName) => {
+      acc[catName] = true;
       return acc
     }, {});
-    this.setState({ unusedCategories: all.filter(cat => usedIds[cat.cat_id]) });
+    this.setState({ unusedCategories: all.filter(cat => !usedNames[cat.cat_name]) });
   }
 
   render() {
@@ -82,11 +84,23 @@ class Budget extends Component {
           unusedCategories={this.state.unusedCategories}
           month={this.props.month}
         />
-        {this.state.categories.map((category, idx) => 
-          <BudgetItem
+        Income
+        {this.state.allCategories.filter(cat => cat.income).map((category, idx) => 
+          this.state.budget[category.cat_name] && < BudgetItem
             key={idx}
-            amount={this.state.budget[category] && this.state.budget[category].amount}
-            name={category}
+            amount={this.state.budget[category.cat_name] && this.state.budget[category.cat_name].amount}
+            name={category.cat_name}
+            idx={idx}
+          />
+        )}
+        <br />     
+        Expenditures
+        {
+          this.state.allCategories.filter(cat => !cat.income).map((category, idx) =>
+          this.state.budget[category.cat_name] && <BudgetItem
+            key={idx}
+            amount={this.state.budget[category.cat_name] && this.state.budget[category.cat_name].amount}
+            name={category.cat_name}
             idx={idx}
           />
         )}

@@ -3,10 +3,10 @@ import './App.css';
 
 import TransactionsMain from './components/transactions/transactionsMain';
 import BudgetMain from './components/createBudget/budgetMain';
+import OverviewMain from './components/overview/overviewMain';
 import TopBar from './components/menus/topBar';
 import SideBar from './components/menus/sideBar';
 
-const OverviewMain = () => <div />;
 
 class App extends Component {
   state = {
