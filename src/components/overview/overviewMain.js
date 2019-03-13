@@ -26,7 +26,6 @@ class Overview extends Component {
   }
 
   recieveSpendingStatus ( event, { month, spending }){
-    console.log(spending);
     const expenditures = [];
     const income = [];
 
@@ -43,8 +42,8 @@ class Overview extends Component {
   render() {
     const { expenditures, income } = this.state;
     return (
-      <div className="flex-column">
-        INCOME
+      <div className="flex-column" style={{ paddingBottom: '50px' }}>
+        <h4>INCOME</h4>
         <ReactTable
           data={income}
           columns={[
@@ -67,15 +66,14 @@ class Overview extends Component {
             {
               Header: 'Waiting For',
               id: 'remaining',
-              accessor: cat => (cat.budget_amount + cat.spending_amount).toFixed(2)
+              accessor: cat => (cat.budget_amount - cat.spending_amount).toFixed(2)
             }
           ]}
           showPagination={false}
           pageSize={income.length}
           className="-striped -highlight"
         />
-        <br />
-        EXPENDITURES
+        <h4>EXPENDITURES</h4>
         <ReactTable
           data={expenditures}
           columns={[
@@ -104,6 +102,15 @@ class Overview extends Component {
           showPagination={false}
           pageSize={expenditures.length}
           className="-striped -highlight"
+          getTrProps = {
+            (state, rowInfo, column) => {
+              return {
+                style: {
+                  background: rowInfo.row.remaining < 0 ? "#ffe2e2" : "#ddffdb"
+                }
+              };
+            }
+          }
         />
       </div>
     );

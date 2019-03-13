@@ -9,6 +9,7 @@ export default class LineItem extends React.Component{
     super(props);
     this.state = {
       category: props.transaction.cat_id || 0,
+      ignore: props.transaction.ignore,
     }
   }
 
@@ -19,12 +20,21 @@ export default class LineItem extends React.Component{
 
   updateCategory(newCat) {
     const { id } = this.props.transaction;
-
     ipcRenderer.send('set-transaction-category', { transaction: id, category: newCat });
   }
 
+  toggleIgnoreTransaction(ignoreVal) {
+    const { id } = this.props.transaction;
+    this.setState({ ignore: ignoreVal, category: 0 })
+    ipcRenderer.send('set-ignore-value', {
+      transaction: id,
+      ignore: ignoreVal ? 1 : 0,
+    });
+  }
+
   render(){
-    const { category } = this.state;
+    const { category, ignore } = this.state;
+    console.log('state', ignore)
     const { availableCategories } = this.props;
     const { entity, date, transaction_amount, id } = this.props.transaction;
     return (
@@ -35,11 +45,16 @@ export default class LineItem extends React.Component{
         <div className = "lineitem-dropdown">
           <select
             value={category}
+            disabled={ignore}
             onChange={(e) => this.handleChange(e.target.value)}
           >
             <option value={0}>Unknown</option>
             {availableCategories.map((cat, idx) => <option key={idx} value={this.props.getCatId(cat)}>{changeCase.titleCase(cat)}</option>)}
           </select>
+        </div>
+        <div className = "lineitem-ignore">
+          ignore?
+          <input type="checkbox" checked={this.state.ignore} onChange={(e) => this.toggleIgnoreTransaction(e.target.checked)} />
         </div>
       </div>
     )

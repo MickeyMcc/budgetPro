@@ -65,15 +65,21 @@ class Transactions extends Component {
                 There are {transactions.length} transactions for {month}.
                 </p>
             </header>
-            To Be Categorized
+            <h4>To Be Categorized</h4>
             <ul className="transaction-list">
-                {transactions.filter((transaction) => !transaction.cat_id).map((transaction, idx) => (
+                {transactions.filter((transaction) => !transaction.ignore && !transaction.cat_id).map((transaction, idx) => (
                 <LineItem key={transaction.id} idx={idx} transaction={transaction} availableCategories={categories} getCatId={(name) => this.getCatId(name)} />
                 ))}
             </ul>
-            Complete
+            <h4>Complete</h4>
             <ul className="transaction-list">
                 {transactions.filter((transaction) => transaction.cat_id).map((transaction, idx) => (
+                <LineItem key={transaction.id} idx={idx} transaction={transaction} availableCategories={categories} getCatId={(name) => this.getCatId(name)} />
+                ))}
+            </ul>
+            <h4>Ignored</h4>
+            <ul className="transaction-list">
+                {transactions.filter((transaction) => transaction.ignore).map((transaction, idx) => (
                 <LineItem key={transaction.id} idx={idx} transaction={transaction} availableCategories={categories} getCatId={(name) => this.getCatId(name)} />
                 ))}
             </ul>

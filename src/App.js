@@ -7,11 +7,22 @@ import OverviewMain from './components/overview/overviewMain';
 import TopBar from './components/menus/topBar';
 import SideBar from './components/menus/sideBar';
 
+const { ipcRenderer } = window.require('electron');
 
 class App extends Component {
   state = {
-    month: 'september',
+    month: 'March 2019',
     sideBarSelected: 0,
+  }
+
+  componentDidMount() {
+    ipcRenderer.on('fetch-data-err', this.reportErr.bind(this));
+    ipcRenderer.on('transaction-update-err', this.reportErr.bind(this));
+    ipcRenderer.on('budget-update-err', this.reportErr.bind(this));
+  }
+
+  reportErr() {
+    console.error('ERROR:', arguments)
   }
 
   MainSection({ selected, month }) {

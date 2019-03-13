@@ -1,7 +1,6 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, ipcMain } = require('electron')
 const {
-  con,
   getTransactionsByMonth,
   getBudgetByMonth,
   getAllCategories,
@@ -38,48 +37,80 @@ function createWindow () {
 app.on('ready', () => {
   createWindow();
 
-  ipcMain.on('fetch-transactions', (event, data) => {
-    getTransactionsByMonth(data, (err, transactions) => {
-      event.sender.send('send-transactions', { ...data, transactions });
+  ipcMain.on('fetch-transactions', (event, sentData) => {
+    getTransactionsByMonth(sentData, (err, transactions) => {
+      if (err) {
+        console.log(err)
+        event.sender.send('fetch-data-err', { err, sentData });
+      } else {
+        event.sender.send('send-transactions', { ...sentData, transactions });
+      }
     })
   });
 
-  ipcMain.on('fetch-budget', (event, data) => {
-    getBudgetByMonth(data, (err, budget) => {
-      event.sender.send('send-budget', { ...data, budget});
+  ipcMain.on('fetch-budget', (event, sentData) => {
+    getBudgetByMonth(sentData, (err, budget) => {
+      if (err) {
+        console.log(err)
+        event.sender.send('fetch-data-err', { err, sentData });
+      } else {
+        event.sender.send('send-budget', { ...sentData, budget });
+      }
     });
   });
 
-  ipcMain.on('fetch-categories', (event, data) => {
-    getAllCategories(data, (err, categories) => {
-      event.sender.send('send-categories', { ...data, categories })
-    })
-  })
-
-  ipcMain.on('set-transaction-category', (event, data) => {
-    updateTransactionCategory(data, (err, data) => {
+  ipcMain.on('fetch-categories', (event, sentData) => {
+    getAllCategories(sentData, (err, categories) => {
       if (err) {
-        event.sender.send('set-transaction-category-err', { ...data, err})
+        console.log(err)
+        event.sender.send('fetch-data-err', { err, sentData });
+      } else {
+        event.sender.send('send-categories', { ...sentData, categories });
       }
-    })
+    });
   });
 
-  ipcMain.on('create-budget-category', (event, data) => {
-    createBudgetCategory(data, (err, data) => {
+  ipcMain.on('fetch-spending-status', (event, sentData) => {
+    getSpendingByMonth({ ...sentData }, (err, spending) => {
+      if (err) {
+        console.log(err)
+        event.sender.send('fetch-data-err', { err, sentData });
+      } else {
+        event.sender.send('send-spending-status', { ...sentData, spending });
+      }
+    });
+  });
+
+  ipcMain.on('set-transaction-category', (event, sentData) => {
+    updateTransactionCategory(sentData, (err, data) => {
+      if (err) {
+        console.log(err)
+        event.sender.send('transaction-update-err', { ...sentData, err });
+      } else {
+        event.sender.send('transaction-update-success', { ...sentData, ...data });
+      }
+    });
+  });
+
+  ipcMain.on('create-budget-category', (event, sentData) => {
+    createBudgetCategory(sentData, (err, data) => {
       console.log('callback!', err, data);
       if (err) {
-        event.sender.send('set-transaction-category-err', { ...data, err});
+        console.log(err)
+        event.sender.send('budget-update-err', { ...sentData, err });
       } else {
-        console.log('sending event');
-        event.sender.send('new-budget-category');
+        event.sender.send('budget-update-success', { ...sentData });
       }
     })
   });
 
-  ipcMain.on('fetch-spending-status', (event, { month }) => {
-    getSpendingByMonth({ month }, (err, data) => {
-      console.log('call back!', err, data);
-      event.sender.send('send-spending-status', { month, spending: data });
+  ipcMain.on('set-ignore-value', (event, sentData) => {
+    console.log(sentData)
+    updateTransactionCategory(sentData, (err, data) => {
+      if (err) {
+        console.log(err)
+        event.sender.send('transaction-update-err', { ...sentData, err });
+      }
     })
   })
 })
@@ -89,7 +120,7 @@ app.on('window-all-closed', function () {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
-    con.end();
+    // con.end();
     app.quit()
   }
 })

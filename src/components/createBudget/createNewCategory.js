@@ -23,12 +23,10 @@ class CreateNewCategory extends Component {
   }
   
   onSelectCategory(id) {
-    console.log(id)
     this.setState({ selected: id })
   }
 
   onSelectDistribution(id) {
-    console.log(id);
     this.setState({ distribution: id })
   }
   
@@ -70,6 +68,7 @@ class CreateNewCategory extends Component {
     }
     
     render() {
+      console.log('unused cates', this.props.unusedCategories)
       return (
         <div className="container-create-category">
         <h4>Add a Category</h4>
@@ -78,7 +77,7 @@ class CreateNewCategory extends Component {
           <select className="category-selector" value={this.state.selected} onChange={(e) => this.onSelectCategory(e.target.value)}>
             <option value={0}>New Category</option>
             {this.props.unusedCategories && this.props.unusedCategories.map(category => 
-              <option value={category.cat_id}>{changeCase.titleCase(category.cat_name)}</option>  
+              <option key={category.cat_id} value={category.cat_id}>{changeCase.titleCase(category.cat_name)}</option>  
               )}
           </select>
           or
@@ -95,7 +94,7 @@ class CreateNewCategory extends Component {
           <select className="category-selector" disabled={this.state.income ? 'disabled' : ''} value={this.state.distribution} onChange={(e) => this.onSelectDistribution(e.target.value)}>
             <option value={0}></option>
             {this.props.allCategories && this.props.allCategories.filter(cat => !cat.income).map(category => 
-              <option value={category.cat_id}>{changeCase.titleCase(category.cat_name)}</option>  
+              <option key={category.cat_id} value={category.cat_id}>{changeCase.titleCase(category.cat_name)}</option>  
               )}
           </select>
         </div>
